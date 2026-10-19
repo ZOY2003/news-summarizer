@@ -2,7 +2,7 @@
 
 用 Python 呼叫 Google Gemini API，透過 **結構化輸出（Structured Output）** 將新聞整理成固定格式的 JSON（標題、摘要、重點、分類、情緒、關鍵字），並用 GitHub Actions 自動部署作品頁到 GitHub Pages。
 
-- 作品頁：https://<你的帳號>.github.io/<repo 名稱>/
+- 作品頁：https://zoy2003.github.io/news-summarizer/
 - 使用的 LLM 能力：結構化輸出（Pydantic schema → JSON）
 
 ## 功能
@@ -63,4 +63,7 @@ API 金鑰只放在 `.env`，該檔已列入 `.gitignore`，不會進入 repo �
 
 ## AI 使用說明
 
-（請依實際情況填寫：用了哪些 AI 工具、用在哪裡、自己修改或驗證了什麼）
+使用的工具:Claude（規劃架構、產生程式碼與網頁初稿、協助排除錯誤）；Gemini 3.8 Flash（程式中實際呼叫的模型）
+用在哪裡:main.py、deploy.yml、index.html、README 初稿
+自己修改了什麼:整理網頁上傳後被攤平的資料夾結構；原模型 gemini-2.5-flash 已停用（404 錯誤），依錯誤訊息改為 gemini-3.8-flash；將部分範例資料換成真實新聞
+如何驗證:逐篇比對原文與摘要，摘要大致正確、意境判定也正確；確認 .env 未進入 commit 歷史
