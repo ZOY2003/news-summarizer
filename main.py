@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 # ---------- 設定 ----------
 load_dotenv()  # 從 .env 讀取 GEMINI_API_KEY（.env 不會進 repo）
-MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 INPUT_FILE = Path("data/news.json")
 OUTPUT_FILE = Path("site/results.json")
 DELAY_SECONDS = 4  # 每篇之間稍等一下，避免超過免費額度的每分鐘上限
