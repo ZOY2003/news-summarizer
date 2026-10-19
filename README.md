@@ -1,0 +1,2 @@
+# news-summarizer
+for homework
