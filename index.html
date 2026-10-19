@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新聞摘要小幫手</title>
+<style>
+  :root {
+    --bg: #f7f5f0; --card: #ffffff; --ink: #1f2328; --muted: #6a6f76;
+    --line: #e4e0d8; --accent: #b3261e; --chip: #f1ece4;
+    --pos: #2e7d4f; --neu: #6a6f76; --neg: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181b; --card: #1f2226; --ink: #e8e6e3; --muted: #9aa0a6;
+      --line: #2f3338; --accent: #ef6b5f; --chip: #2a2e33;
+      --pos: #6cc28f; --neu: #9aa0a6; --neg: #ef6b5f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    line-height: 1.75; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 16px 64px; }
+  header { padding: 56px 0 24px; border-bottom: 3px solid var(--accent); margin-bottom: 8px; }
+  header .tag { color: var(--accent); font-weight: 700; letter-spacing: .1em; font-size: 13px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); margin: 4px 0 8px; }
+  header p { color: var(--muted); margin: 0; }
+  nav { display: flex; gap: 16px; flex-wrap: wrap; padding: 12px 0 0; font-size: 14px; }
+  nav a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+  section { padding-top: 40px; }
+  h2 { font-size: 22px; margin: 0 0 12px; display: flex; align-items: baseline; gap: 10px; }
+  h2 .no { color: var(--accent); font-variant-numeric: tabular-nums; }
+  pre { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; font-size: 14px; line-height: 1.6; }
+  code { font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+  .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 16px 0; }
+  .flow div { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; font-size: 14px; }
+  .flow b { display: block; color: var(--accent); font-size: 13px; }
+  .meta { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+  .stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip { background: var(--chip); border-radius: 999px; padding: 2px 10px; font-size: 13px; }
+  .grid { display: grid; gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+  .card .top { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px; margin-bottom: 4px; }
+  .cat { color: var(--accent); font-weight: 700; }
+  .s-正面 { color: var(--pos); } .s-中性 { color: var(--neu); } .s-負面 { color: var(--neg); }
+  .card h3 { margin: 2px 0 6px; font-size: 18px; }
+  .card .orig { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+  .card ul { margin: 8px 0; padding-left: 20px; }
+  .kw { display: flex; gap: 6px; flex-wrap: wrap; }
+  details { margin-top: 8px; font-size: 13px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); font-size: 15px; }
+  th, td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--chip); white-space: nowrap; }
+  .empty { padding: 20px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); }
+  footer { margin-top: 56px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="tag">PYTHON × LLM × GITHUB ACTIONS</div>
+    <h1>新聞摘要小幫手</h1>
+    <p>輸入新聞全文，由 Gemini 以「結構化輸出」整理成標題、摘要、重點、分類、情緒與關鍵字。</p>
+    <nav>
+      <a href="#what">01 做了什麼</a><a href="#how">02 怎麼執行</a>
+      <a href="#result">03 執行結果</a><a href="#ai">04 AI 使用說明</a>
+    </nav>
+  </header>
+
+  <section id="what">
+    <h2><span class="no">01</span>做了什麼</h2>
+    <p>新聞常常很長，快速掌握重點不容易。這支 Python 程式讀取多篇新聞，呼叫 Google Gemini API，並使用 <b>結構化輸出（Structured Output）</b>：以 Pydantic 定義固定欄位，讓模型一定回傳格式正確的 JSON，而不是一段自由文字。結果存成 <code>results.json</code>，再由本頁讀取呈現。</p>
+    <div class="flow">
+      <div><b>① 輸入</b>data/news.json<br>多篇新聞標題與內文</div>
+      <div><b>② 呼叫 LLM</b>Gemini API<br>附上 Pydantic schema</div>
+      <div><b>③ 輸出</b>site/results.json<br>格式固定的結構化資料</div>
+      <div><b>④ 發布</b>GitHub Actions<br>自動部署到 Pages</div>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2><span class="no">02</span>怎麼執行</h2>
+    <pre><code># 1. 安裝套件（使用 uv）
+uv sync
+
+# 2. 設定金鑰：複製範例檔後填入自己的 Gemini API key
+cp .env.example .env
+
+# 3. 執行摘要程式，結果會寫入 site/results.json
+uv run main.py
+
+# 4. commit 並 push，GitHub Actions 會自動部署本頁
+git add . && git commit -m "更新摘要結果" && git push</code></pre>
+    <p>金鑰只存在 <code>.env</code>，已列入 <code>.gitignore</code>，不會上傳到 GitHub。</p>
+  </section>
+
+  <section id="result">
+    <h2><span class="no">03</span>執行結果</h2>
+    <div id="results"><div class="empty">載入中…</div></div>
+  </section>
+
+  <section id="ai">
+    <h2><span class="no">04</span>AI 使用說明</h2>
+    <table>
+      <tr><th>使用的工具</th><td>【請填寫】例：Claude（規劃架構、產生程式碼初稿與網頁）、Gemini 2.5 Flash（程式中實際呼叫的模型）</td></tr>
+      <tr><th>用在哪裡</th><td>【請填寫】例：main.py 初稿、GitHub Actions workflow、作品頁版型</td></tr>
+      <tr><th>自己修改了什麼</th><td>【請填寫】例：調整 prompt 規則、更換測試新聞、修改分類項目</td></tr>
+      <tr><th>如何驗證</th><td>【請填寫】例：逐篇比對原文與摘要，確認沒有捏造內容；檢查分類與情緒是否合理</td></tr>
+    </table>
+  </section>
+
+  <footer>Tunghai University · 課程作業</footer>
+</div>
+
+<script>
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+fetch("results.json", { cache: "no-store" })
+  .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+  .then(data => {
+    const items = data.items || [];
+    const count = (key) => items.reduce((m, it) => (m[it[key]] = (m[it[key]] || 0) + 1, m), {});
+    const chips = obj => Object.entries(obj).map(([k, v]) => `<span class="chip">${esc(k)} ${v}</span>`).join("");
+    const cards = items.map(it => `
+      <article class="card">
+        <div class="top"><span class="cat">${esc(it.category)}</span>
+          <span class="s-${esc(it.sentiment)}">● ${esc(it.sentiment)}</span>
+          <span class="meta" style="margin:0">原文 ${esc(it.original_length)} 字 → 摘要 ${esc((it.summary||"").length)} 字</span></div>
+        <h3>${esc(it.headline)}</h3>
+        <div class="orig">原標題：${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.original_title)}</a>` : esc(it.original_title)}${it.source ? `｜${esc(it.source)}` : ""}</div>
+        <p style="margin:0">${esc(it.summary)}</p>
+        <ul>${(it.key_points||[]).map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+        <div class="kw">${(it.keywords||[]).map(k => `<span class="chip">#${esc(k)}</span>`).join("")}</div>
+        <details><summary>查看原始 JSON</summary><pre><code>${esc(JSON.stringify(it, null, 2))}</code></pre></details>
+      </article>`).join("");
+    document.getElementById("results").innerHTML = `
+      <div class="meta">模型：${esc(data.model)}｜產生時間：${esc(data.generated_at)}｜共 ${items.length} 篇</div>
+      <div class="stats">${chips(count("category"))}${chips(count("sentiment"))}</div>
+      <div class="grid">${cards}</div>`;
+  })
+  .catch(() => {
+    document.getElementById("results").innerHTML =
+      '<div class="empty">尚未產生結果。請先執行 <code>uv run main.py</code> 並將 site/results.json commit 上傳。</div>';
+  });
+</script>
+</body>
+</html>

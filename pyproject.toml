@@ -1,0 +1,11 @@
+[project]
+name = "news-summarizer"
+version = "0.1.0"
+description = "用 Gemini 結構化輸出整理新聞摘要，並以 GitHub Pages 發布作品頁"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-genai>=1.0.0",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
+]
