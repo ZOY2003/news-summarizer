@@ -104,10 +104,10 @@ git add . && git commit -m "更新摘要結果" && git push</code></pre>
   <section id="ai">
     <h2><span class="no">04</span>AI 使用說明</h2>
     <table>
-      <tr><th>使用的工具</th><td>【請填寫】例：Claude（規劃架構、產生程式碼初稿與網頁）、Gemini 2.5 Flash（程式中實際呼叫的模型）</td></tr>
-      <tr><th>用在哪裡</th><td>【請填寫】例：main.py 初稿、GitHub Actions workflow、作品頁版型</td></tr>
-      <tr><th>自己修改了什麼</th><td>【請填寫】例：調整 prompt 規則、更換測試新聞、修改分類項目</td></tr>
-      <tr><th>如何驗證</th><td>【請填寫】例：逐篇比對原文與摘要，確認沒有捏造內容；檢查分類與情緒是否合理</td></tr>
+      <tr><th>使用的工具</th><td>Claude（規劃架構、產生程式碼與網頁初稿、協助排除錯誤）；Gemini 3.8 Flash（程式中實際呼叫的模型）</td></tr>
+      <tr><th>用在哪裡</th><td>main.py、deploy.yml、index.html、README 初稿</td></tr>
+      <tr><th>自己修改了什麼</th><td>整理網頁上傳後被攤平的資料夾結構；原模型 gemini-2.5-flash 已停用（404 錯誤），依錯誤訊息改為 gemini-3.8-flash；將部分範例資料換成真實新聞</td></tr>
+      <tr><th>如何驗證</th><td>逐篇比對原文與摘要，摘要大致正確、意境判定也正確；確認 .env 未進入 commit 歷史</td></tr>
     </table>
   </section>
 
